@@ -1,4 +1,4 @@
-# Docker sample
+# Dockerized Actix-Web sample
 
 ## Build image
 
