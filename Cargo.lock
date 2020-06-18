@@ -266,6 +266,7 @@ dependencies = [
  "actix-rt",
  "actix-web",
  "chrono",
+ "lazy_static",
  "serde",
  "serde_derive",
  "serde_json",
