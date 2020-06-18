@@ -2,45 +2,31 @@ extern crate actix_web;
 #[macro_use]
 extern crate serde_json;
 
-//extern crate serde_derive;
-use serde_derive::{Serialize, Deserialize};
-
 use actix_web::{get, middleware, web, App, HttpResponse, HttpServer, Responder};
 
+use std::collections::HashMap;
 use std::env;
 use std::thread;
-use std::collections::HashMap;
 
 mod indicators;
 use indicators::init;
 
-#[derive(Deserialize)]
-pub struct SMARequest {
-    indicator: String,
-    interval: String,
-    period: u8,
-}
-/*
-#[derive(Serialize, Deserialize, Default)]
-struct MyStruct {
-    #[serde(serialize_with = "ordered_map")]
-    map: HashMap<String, String>,
-}
-*/
-
 #[get("/")]
 async fn index() -> impl Responder {
     println!("GET: /");
-    HttpResponse::Ok().body("Hello world! Get the Simple Moving Average of your favorits commodities")
+    HttpResponse::Ok()
+        .body("Hello world! Get the Simple Moving Average (SMA) of your favourites commodities")
 }
 
-// https://www.alphavantage.co/query
-// ?function=SMA&symbol=IBM&interval=weekly&time_period=10&series_type=open&apikey=demo
+// sample: ?function=SMA&symbol=IBM&interval=weekly&time_period=10&series_type=open&apikey=demo
+// TODO validations
 #[get("/sma")]
-async fn get_sma(query : web::Query<HashMap<String, String>>) -> impl Responder {
+async fn get_sma(query: web::Query<HashMap<String, String>>) -> impl Responder {
     let indicator = query.get("indicator").unwrap();
-    println!("GET: /sma?indicator={}", indicator);
-    let sma_map = indicators::get_sma(indicator);
+    let period = query.get("period").unwrap();
+    println!("GET: /sma?indicator={}&period={}", indicator, period);
+    let sma_map = indicators::get_sma(indicator, period.parse::<usize>().unwrap());
+
     HttpResponse::Ok().json(sma_map)
 }
 
